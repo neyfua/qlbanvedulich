@@ -7,7 +7,6 @@ import view.panels.*;
 public class MainPanel extends JFrame {
   private static final String CARD_KHACH_HANG = "KHACH_HANG";
   private static final String CARD_TOUR = "TOUR";
-  private static final String CARD_VE = "VE";
   private static final String CARD_BOOKING = "BOOKING";
   private static final String CARD_THANH_TOAN = "THANH_TOAN";
 
@@ -51,7 +50,6 @@ public class MainPanel extends JFrame {
 
     sidebar.add(menuButton("👥 Khách Hàng", CARD_KHACH_HANG));
     sidebar.add(menuButton("✈️ Tour", CARD_TOUR));
-    sidebar.add(menuButton("🎟 Vé", CARD_VE));
     sidebar.add(menuButton("📋 Booking", CARD_BOOKING));
     sidebar.add(menuButton("💳 Thanh Toán", CARD_THANH_TOAN));
 
@@ -65,7 +63,6 @@ public class MainPanel extends JFrame {
 
     content.add(new KhachHangPanel(), CARD_KHACH_HANG);
     content.add(new TuaDuLichPanel(), CARD_TOUR);
-    content.add(new VePanel(), CARD_VE);
     content.add(new BookingPanel(), CARD_BOOKING);
     content.add(new ThanhToanPanel(), CARD_THANH_TOAN);
 

@@ -2,6 +2,7 @@ package view.panels;
 
 import dao.BookingDAO;
 import dao.KhachHangDAO;
+import dao.TuaDuLichDAO;
 import dao.VeDAO;
 import java.awt.*;
 import java.util.List;
@@ -9,15 +10,18 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import model.Booking;
 import model.KhachHang;
+import model.LoaiVe;
+import model.TuaDuLich;
 import model.Ve;
 
 public class BookingPanel extends JPanel {
 
   private JTable table;
-  private DefaultTableModel model;
+  private DefaultTableModel tableModel;
 
   private JComboBox<KhachHang> cbCustomer;
   private JComboBox<Ve> cbTicket;
+  private JComboBox<TuaDuLich> cbTour;
   private JTextField txtQty;
 
   private BookingDAO dao = new BookingDAO();
@@ -34,7 +38,6 @@ public class BookingPanel extends JPanel {
     add(createFormPanel(), BorderLayout.SOUTH);
   }
 
-  // ---------- Buttons ----------
   private JPanel createButtonPanel() {
     JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
@@ -53,21 +56,20 @@ public class BookingPanel extends JPanel {
     return p;
   }
 
-  // ---------- Table ----------
   private JScrollPane createTablePanel() {
-    model = new DefaultTableModel(
-        new String[] {"ID", "Khách Hàng", "Vé", "Số lượng"}, 0) {
+    tableModel = new DefaultTableModel(new String[] {"ID", "Khách Hàng", "Vé",
+                                                     "Tua Du Lịch", "Số lượng",
+                                                     "Ngày tạo"},
+                                       0) {
       public boolean isCellEditable(int r, int c) { return false; }
     };
 
-    table = new JTable(model);
+    table = new JTable(tableModel);
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     table.getSelectionModel().addListSelectionListener(e -> fillForm());
 
     return new JScrollPane(table);
   }
-
-  // ---------- Form ----------
 
   private JPanel createFormPanel() {
     JPanel p = new JPanel(new GridLayout(1, 6, 10, 10));
@@ -75,13 +77,17 @@ public class BookingPanel extends JPanel {
 
     cbCustomer = new JComboBox<>();
     cbTicket = new JComboBox<>();
+    cbTour = new JComboBox<>();
     txtQty = new JTextField();
 
     loadCustomers();
     loadTickets();
+    loadTours();
 
-    p.add(new JLabel("Khách hàng"));
+    p.add(new JLabel("ID Khách hàng"));
     p.add(cbCustomer);
+    p.add(new JLabel("Tua Du Lịch"));
+    p.add(cbTour);
     p.add(new JLabel("Vé"));
     p.add(cbTicket);
     p.add(new JLabel("Số lượng"));
@@ -104,14 +110,21 @@ public class BookingPanel extends JPanel {
     }
   }
 
-  // ---------- Logic ----------
+  private void loadTours() {
+    cbTour.removeAllItems();
+    for (TuaDuLich t : new TuaDuLichDAO().findAll()) {
+      cbTour.addItem(t);
+    }
+  }
+
   private void loadData() {
-    model.setRowCount(0);
+    tableModel.setRowCount(0);
     List<Booking> list = dao.findAll();
 
     for (Booking b : list) {
-      model.addRow(new Object[] {b.getId(), b.getCustomerId(), b.getTicketId(),
-                                 b.getQuantity()});
+      tableModel.addRow(new Object[] {b.getId(), b.getCustomerName(),
+                                      b.getTicketType(), b.getTourName(),
+                                      b.getQuantity(), b.getCreatedDate()});
     }
   }
 
@@ -144,13 +157,21 @@ public class BookingPanel extends JPanel {
 
   private void deleteBooking() {
     int row = table.getSelectedRow();
-    if (row == -1)
+    if (row == -1) {
+      JOptionPane.showMessageDialog(this, "Vui lòng chọn booking cần xóa");
       return;
+    }
 
-    int id = (int)model.getValueAt(row, 0);
-    dao.delete(id);
-    loadData();
-    clearForm();
+    int confirm = JOptionPane.showConfirmDialog(
+        this, "Bạn có chắc muốn xóa khách hàng này?", "Xác nhận",
+        JOptionPane.YES_NO_OPTION);
+
+    if (confirm == JOptionPane.YES_OPTION) {
+      int id = (int)tableModel.getValueAt(row, 0);
+      dao.delete(id);
+      loadData();
+      clearForm();
+    }
   }
 
   private void fillForm() {
@@ -158,31 +179,40 @@ public class BookingPanel extends JPanel {
     if (r == -1)
       return;
 
-    int customerId = (int)model.getValueAt(r, 1);
-    int ticketId = (int)model.getValueAt(r, 2);
+    String customerName = tableModel.getValueAt(r, 1).toString();
+    LoaiVe ticketType = (LoaiVe)tableModel.getValueAt(r, 2);
+    String tourName = tableModel.getValueAt(r, 3).toString();
+    txtQty.setText(tableModel.getValueAt(r, 4).toString());
 
-    // select customer in combo box
+    // select customer
     for (int i = 0; i < cbCustomer.getItemCount(); i++) {
-      if (cbCustomer.getItemAt(i).getId() == customerId) {
+      if (cbCustomer.getItemAt(i).getName().equals(customerName)) {
         cbCustomer.setSelectedIndex(i);
         break;
       }
     }
 
-    // select ticket in combo box
+    // select ticket
     for (int i = 0; i < cbTicket.getItemCount(); i++) {
-      if (cbTicket.getItemAt(i).getId() == ticketId) {
+      if (cbTicket.getItemAt(i).getTicketType() == ticketType) {
         cbTicket.setSelectedIndex(i);
         break;
       }
     }
 
-    txtQty.setText(model.getValueAt(r, 3).toString());
+    // select tour
+    for (int i = 0; i < cbTour.getItemCount(); i++) {
+      if (cbTour.getItemAt(i).getTourName().equals(tourName)) {
+        cbTour.setSelectedIndex(i);
+        break;
+      }
+    }
   }
 
   private void clearForm() {
     cbCustomer.setSelectedIndex(-1);
     cbTicket.setSelectedIndex(-1);
+    cbTour.setSelectedIndex(-1);
     txtQty.setText("");
     table.clearSelection();
   }

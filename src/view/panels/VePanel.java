@@ -55,10 +55,14 @@ public class VePanel extends JPanel {
 
   private JScrollPane createTable() {
     tableModel = new DefaultTableModel(
-        new String[] {"ID", "Tour ID", "Loại vé", "Giá"}, 0);
+        new String[] {"ID", "Tua Du Lịch", "Loại vé", "Giá"}, 0) {
+      public boolean isCellEditable(int r, int c) { return false; }
+    };
+
     table = new JTable(tableModel);
-    table.getSelectionModel().addListSelectionListener(
-        e -> fillFormFromTable());
+    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    table.getSelectionModel().addListSelectionListener(e -> fillForm());
+
     return new JScrollPane(table);
   }
 
@@ -72,8 +76,7 @@ public class VePanel extends JPanel {
 
     loadTours();
 
-    p.add(new JLabel("Tour ID"));
-    p.add(new JLabel("Tour"));
+    p.add(new JLabel("Tua Du Lịch"));
     p.add(cbTour);
     p.add(new JLabel("Loại"));
     p.add(cbType);
@@ -86,7 +89,8 @@ public class VePanel extends JPanel {
   private void loadData() {
     tableModel.setRowCount(0);
     for (Ve v : dao.findAll()) {
-      tableModel.addRow(new Object[] {v.getId(), v.getTourId(),
+      tableModel.addRow(new Object[] {v.getId(),
+                                      v.getTourName(), // displayed
                                       v.getTicketType(), v.getPrice()});
     }
   }
@@ -100,16 +104,30 @@ public class VePanel extends JPanel {
   }
 
   private void addVe() {
-    Ve v = new Ve();
-    TuaDuLich selectedTour = (TuaDuLich)cbTour.getSelectedItem();
-    if (selectedTour != null) {
+    try {
+      TuaDuLich selectedTour = (TuaDuLich)cbTour.getSelectedItem();
+      LoaiVe selectedType = (LoaiVe)cbType.getSelectedItem();
+
+      if (selectedTour == null || selectedType == null) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn tour và loại vé");
+        return;
+      }
+
+      Ve v = new Ve();
       v.setTourId(selectedTour.getId());
+      v.setTicketType(selectedType);
+      v.setPrice(new BigDecimal(txtPrice.getText().trim()));
+
+      dao.insert(v);
+
+      loadData();
+      clearForm();
+
+      JOptionPane.showMessageDialog(this, "Thêm vé thành công!");
+    } catch (Exception e) {
+      JOptionPane.showMessageDialog(this, "Lỗi: " + e.getMessage(), "Lỗi",
+                                    JOptionPane.ERROR_MESSAGE);
     }
-
-    v.setPrice(new BigDecimal(txtPrice.getText()));
-
-    loadData();
-    clearForm();
   }
 
   private void editVe() {
@@ -147,12 +165,13 @@ public class VePanel extends JPanel {
     loadData();
   }
 
-  private void fillFormFromTable() {
+  private void fillForm() {
     int row = table.getSelectedRow();
     if (row == -1)
       return;
 
     int tourId = (int)tableModel.getValueAt(row, 1);
+
     for (int i = 0; i < cbTour.getItemCount(); i++) {
       if (cbTour.getItemAt(i).getId() == tourId) {
         cbTour.setSelectedIndex(i);
@@ -160,10 +179,10 @@ public class VePanel extends JPanel {
       }
     }
 
-    LoaiVe type = (LoaiVe)tableModel.getValueAt(row, 2);
+    LoaiVe type = (LoaiVe)tableModel.getValueAt(row, 3);
     cbType.setSelectedItem(type);
 
-    txtPrice.setText(tableModel.getValueAt(row, 3).toString());
+    txtPrice.setText(tableModel.getValueAt(row, 4).toString());
   }
 
   private void clearForm() {

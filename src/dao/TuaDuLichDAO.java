@@ -35,7 +35,7 @@ public class TuaDuLichDAO {
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -69,7 +69,7 @@ public class TuaDuLichDAO {
         list.add(tua);
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     return list;
@@ -106,7 +106,7 @@ public class TuaDuLichDAO {
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -120,7 +120,7 @@ public class TuaDuLichDAO {
       ps.executeUpdate();
 
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 }

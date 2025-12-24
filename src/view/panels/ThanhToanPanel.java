@@ -42,7 +42,7 @@ public class ThanhToanPanel extends JPanel {
   // ---------- Table ----------
   private JScrollPane createTablePanel() {
     model = new DefaultTableModel(
-        new String[] {"ID", "Khách", "Vé", "SL", "Đã thanh toán"}, 0) {
+        new String[] {"ID", "ID Khách Hàng", "Vé", "SL", "Đã thanh toán"}, 0) {
       public boolean isCellEditable(int r, int c) { return false; }
     };
 

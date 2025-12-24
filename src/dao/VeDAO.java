@@ -12,25 +12,34 @@ import model.LoaiVe;
 import model.Ve;
 
 public class VeDAO {
-  private static final String INSERT_SQL =
-      "INSERT INTO ticket (tour_id, ticket_type, price) VALUES (?, ?, ?)";
-
   public void insert(Ve ve) {
+    String sql =
+        "INSERT INTO ticket (tour_id, ticket_type, price) VALUES (?, ?, ?)";
+
     try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(INSERT_SQL)) {
+         PreparedStatement ps = conn.prepareStatement(sql)) {
       ps.setInt(1, ve.getTourId());
       ps.setString(2, ve.getTicketType().name());
       ps.setBigDecimal(3, ve.getPrice());
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
   public List<Ve> findAll() {
+    String sql = """
+      SELECT t.id,
+             t.tour_id,
+             tr.tour_name AS tour_name,
+             t.ticket_type,
+             t.price
+      FROM ticket t
+      JOIN tour tr ON t.tour_id = tr.id
+  """;
+
     List<Ve> list = new ArrayList<>();
-    String sql = "SELECT * FROM ticket";
 
     try (Connection conn = DBConnection.getConnection();
          Statement st = conn.createStatement();
@@ -40,6 +49,7 @@ public class VeDAO {
         Ve ve = new Ve();
         ve.setId(rs.getInt("id"));
         ve.setTourId(rs.getInt("tour_id"));
+        ve.setTourName(rs.getString("tour_name"));
         ve.setTicketType(LoaiVe.valueOf(rs.getString("ticket_type")));
         ve.setPrice(rs.getBigDecimal("price"));
 

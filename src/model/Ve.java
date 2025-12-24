@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 public class Ve {
   private int id;
   private int tourId;
+  private String tourName;
   private LoaiVe ticketType;
   private BigDecimal price;
 
@@ -12,6 +13,7 @@ public class Ve {
 
   public Ve(int tourId, LoaiVe ticketType, BigDecimal price) {
     this.setTourId(tourId);
+    this.setTourName(tourName);
     this.setTicketType(ticketType);
     this.setPrice(price);
   }
@@ -22,9 +24,17 @@ public class Ve {
   public int getTourId() { return tourId; }
   public void setTourId(int tourId) {
     if (tourId <= 0) {
-      throw new IllegalArgumentException("ID tua du lịch không hợp lệ.");
+      throw new IllegalArgumentException("ID Tua Du Lịch không hợp lệ.");
     }
     this.tourId = tourId;
+  }
+
+  public String getTourName() { return tourName; }
+  public void setTourName(String tourName) {
+    if (tourName == null || tourName.isBlank()) {
+      throw new IllegalAccessError("Tên Tua không hợp lệ.");
+    }
+    this.tourName = tourName;
   }
 
   public LoaiVe getTicketType() { return ticketType; }

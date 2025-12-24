@@ -22,14 +22,12 @@ public class KhachHangPanel extends JPanel {
     loadData();
   }
 
-  // ================= UI =================
   private void initUI() {
     add(createButtonPanel(), BorderLayout.NORTH);
     add(createTablePanel(), BorderLayout.CENTER);
     add(createFormPanel(), BorderLayout.SOUTH);
   }
 
-  // ---------- Buttons ----------
   private JPanel createButtonPanel() {
     JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 

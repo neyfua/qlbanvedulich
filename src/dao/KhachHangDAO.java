@@ -29,7 +29,7 @@ public class KhachHangDAO {
         list.add(kh);
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     return list;
@@ -48,7 +48,7 @@ public class KhachHangDAO {
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -67,7 +67,7 @@ public class KhachHangDAO {
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
@@ -81,7 +81,7 @@ public class KhachHangDAO {
       ps.executeUpdate();
 
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 }

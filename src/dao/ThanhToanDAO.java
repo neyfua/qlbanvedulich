@@ -19,7 +19,7 @@ public class ThanhToanDAO {
 
       ps.executeUpdate();
     } catch (SQLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 }
